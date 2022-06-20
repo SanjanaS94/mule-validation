@@ -1,0 +1,10 @@
+{
+  "sampleData": {
+    "386418a3-d2d5-4e4a-aaeb-659b6cf9a956": {
+      "vars-id": "sample_data/defaultnumbertype.dwl"
+    },
+    "dd808d45-803f-4ae7-84f5-1d0b1b08f40a": {
+      "vars-conid": "sample_data/list_csv_1.csv"
+    }
+  }
+}

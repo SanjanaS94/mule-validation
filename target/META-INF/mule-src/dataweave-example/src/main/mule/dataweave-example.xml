@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="dataweave-exampleFlow" doc:id="9ec6cc49-7bf7-4177-ab6f-7650c5fa7339" >
+		<http:listener doc:name="Listener" doc:id="deda6de3-89c2-4039-9e41-1cfa9cd038c8" config-ref="HTTP_Listener_config" path="/eg"/>
+		<ee:transform doc:name="Transform Message" doc:id="eff64fad-992f-4287-9795-9f59a0840661">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/java
+var arr=[1,2,3,4,5]
+---
+//removing ODD values
+//arr filter ((item, index) -> isOdd(item))
+//remove EVEN index
+arr filter((item,index)->isOdd(index))
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="Transform Message" doc:id="3118b163-2c72-4ca3-8fb0-e6f12d64e2c6" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+var payload = [
+  {
+    "id": 1,
+    "status": "waiting"
+  },
+  {
+    "id": 2,
+    "status": "processed"
+  },
+  {
+    "id": 3,
+    "status": "waiting"
+  }
+]
+var arr=[
+  "starting", 
+  "waiting", 
+  "deleted", 
+  "processing", 
+  "processed"
+]
+var str={
+  "one":   "two",
+  "three": "four",
+  "five":  "six"
+}
+var nn={
+  "one":   "two",
+  "three": null,
+  "five":  null
+}
+---
+//payload filter((value,index)-> value.status != "processed")
+
+//arr filter((value,index)-> value != "processed" and value != "deleted")
+
+//str mapObject ((value, key, index) ->{(upper(key)):(upper(value))} )
+
+nn filterObject $ != null]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="Transform Message" doc:id="d556bfd7-bcfa-4f60-87cc-0e4c70d4709e" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+var invoices = [
+  {
+    "invoiceId": 1,
+    "amount":    100 },
+  {
+    "invoiceId": 2,
+    "amount":    200 },
+  {
+    "invoiceId": 3,
+    "amount":    300 }]
+  var allocations = [
+  {
+    "allocationId":     1,
+    "invoiceId":        1,
+    "allocationAmount": 50 },
+  {
+    "allocationId":     2,
+    "invoiceId":        1,
+    "allocationAmount": 50 },
+  {
+    "allocationId":     3,
+    "invoiceId":        2,
+    "allocationAmount": 100 },
+  {
+    "allocationId":     4,
+    "invoiceId":        2,
+    "allocationAmount": 100 },
+  {
+    "allocationId":     5,
+    "invoiceId":        3,
+    "allocationAmount": 150 },
+  {
+    "allocationId":     6,
+    "invoiceId":        3,
+    "allocationAmount": 150 }]
+---
+invoices map ((item, index) ->{
+    invoiceId: item.invoiceId,
+    amount: item.amount,
+   Allocation: allocations filter ((item1, index) -> item1.invoiceId contains item.invoiceId )
+
+} )
+
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="Transform Message" doc:id="90884fdb-d1ff-43b3-8876-59f0cbd66c4f" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[
+%dw 2.0
+output application/json
+---
+ (payload distinctBy ($.invoiceId)  
+map((value, key) -> {
+    invoiceId:value.invoiceId ,
+    vendorName: value.vendorName,
+    total:value.total,
+    item: payload filter((item,index)-> value.invoiceId  contains item.invoiceId) 
+    map ((item, index) -> {
+        item: item.lineItem,
+        amount: item.lineItemAmount
+    } )
+    }))
+
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="Transform Message" doc:id="d4b4f5f6-9a6a-4331-9a20-5ba250f92872" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+var payload=[
+  { "merchantName": "HelloFresh"    },
+  { "merchantName": "Amazon"        },
+  { "merchantName": "Walmart"       },
+  { "merchantName": "Guitar Center" }
+]
+---
+payload groupBy ((item, index) -> if(sizeOf(item.merchantName)>9)"true"  else "false" )]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>
