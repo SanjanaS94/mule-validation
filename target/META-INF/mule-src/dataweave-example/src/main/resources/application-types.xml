@@ -17,6 +17,24 @@ type csveg = Array<{|  invoiceId: String,   vendorName: String,   total: String,
         <types:property name="separator" value=","/>
       </types:properties>
     </types:type>
+    <types:type name="conductorID" format="java">
+      <types:shape format="raml"><![CDATA[#%RAML 1.0 DataType
+type: number]]></types:shape>
+    </types:type>
+    <types:type name="conID" format="csv">
+      <types:shape format="weave"><![CDATA[%dw 2.0
+
+type conID = Array<{| "conid ": String |}> {"isQuotedString": "false",
+"header": "true",
+"headerLineNumber": "0"}
+
+]]></types:shape>
+      <types:properties>
+        <types:property name="headerLineNumber" value="0"/>
+        <types:property name="header" value="true"/>
+        <types:property name="isQuotedString" value="false"/>
+      </types:properties>
+    </types:type>
   </types:catalog>
   <types:enrichment select="#90884fdb-d1ff-43b3-8876-59f0cbd66c4f">
     <types:processor-declaration>
@@ -24,6 +42,15 @@ type csveg = Array<{|  invoiceId: String,   vendorName: String,   total: String,
         <types:message>
           <types:payload type="csveg"/>
         </types:message>
+      </types:input-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#386418a3-d2d5-4e4a-aaeb-659b6cf9a956">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:variables>
+          <types:variable name="id" type="conductorID"/>
+        </types:variables>
       </types:input-event>
     </types:processor-declaration>
   </types:enrichment>

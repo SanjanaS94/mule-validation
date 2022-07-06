@@ -5,11 +5,8 @@
 	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mule/validation/current/mule-validation.xsd
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
-	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="a2b7af38-c642-4414-a548-838b39ef7692" >
-		<http:listener-connection host="0.0.0.0" port="8081" />
-	</http:listener-config>
 	<flow name="isnullFlow" doc:id="5c3b4150-7951-43ea-aad4-935aa5445f3f" >
-		<http:listener doc:name="Listener" doc:id="0e4a59cf-108a-422c-b8e9-082b5cf91b78" config-ref="HTTP_Listener_config" path="/isnull"/>
+		<http:listener doc:name="Listener" doc:id="0e4a59cf-108a-422c-b8e9-082b5cf91b78" path="/isnull" config-ref="HTTP_Listener_config"/>
 		<set-payload value='#["before"]' doc:name="Set Payload" doc:id="e446a7cc-4ed0-416e-8f05-701aca12fc5e" />
 		<validation:is-null doc:name="Is null" doc:id="05e34c1c-b62d-4bb4-b4cb-acbdd6e81a55" value="#[payload]" message="validation error"/>
 		<set-payload value='#["after"]' doc:name="Set Payload" doc:id="c085979b-704e-47a1-ab07-c11c57691e66" />

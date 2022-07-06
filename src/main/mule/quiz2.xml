@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="quiz2Flow" doc:id="6dd536a0-f84d-49b8-b0a0-ae95b8b42722" >
+		<http:listener doc:name="Listener" doc:id="f0620f31-2262-4abd-97c4-1f37dd426815" path="/quiz2" config-ref="HTTP_Listener_config"/>
+		<ee:transform doc:name="Transform Message" doc:id="0825e5f4-0874-4c12-8009-eff489f70287" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+//{
+//"geo":[{
+//    "us":"United States",
+//    "uk" : "United Kingdom",
+//    "pl" : "Poland",
+//    "in" : "India"
+//}],
+//"continent": {
+//"Europe" : ["uk","fr"] ,
+//"Asia" : ["in","china"],
+//"America" :["us"]
+//}
+//} 
+var geo = {(payload.geo )}
+var asia = payload.continent.Asia
+var europe = payload.continent.Europe
+var america = payload.continent.America
+fun continent(code) = " belongs to " ++ code ++ " continent"
+---
+geo mapObject(key,value,index)->{
+	(key) : "geo " ++ value ++ if (asia contains value as String) continent("Asia")
+	else if(europe contains value as String) continent("Europe")
+	else if (america contains value as String) continent("America")
+	else " does not belong to the continent mentioned above"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>

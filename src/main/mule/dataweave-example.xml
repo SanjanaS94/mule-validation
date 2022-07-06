@@ -5,8 +5,11 @@
 	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
 http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="176bf621-9d87-4c2a-9129-9b8ff1c49e35" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
 	<flow name="dataweave-exampleFlow" doc:id="9ec6cc49-7bf7-4177-ab6f-7650c5fa7339" >
-		<http:listener doc:name="Listener" doc:id="deda6de3-89c2-4039-9e41-1cfa9cd038c8" config-ref="HTTP_Listener_config" path="/eg"/>
+		<http:listener doc:name="Listener" doc:id="deda6de3-89c2-4039-9e41-1cfa9cd038c8" path="/eg" config-ref="HTTP_Listener_config"/>
 		<ee:transform doc:name="Transform Message" doc:id="eff64fad-992f-4287-9795-9f59a0840661">
 			<ee:message>
 				<ee:set-payload><![CDATA[%dw 2.0
