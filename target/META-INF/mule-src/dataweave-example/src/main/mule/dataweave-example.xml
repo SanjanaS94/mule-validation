@@ -150,5 +150,21 @@ var payload=[
 payload groupBy ((item, index) -> if(sizeOf(item.merchantName)>9)"true"  else "false" )]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
+		<ee:transform doc:name="Transform Message" doc:id="386418a3-d2d5-4e4a-aaeb-659b6cf9a956" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/xml
+var conID = [124,631]
+---
+teams:
+{(
+	conID map((item,index)->{
+		team:{
+			id:item
+		}
+	})
+)}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
 	</flow>
 </mule>

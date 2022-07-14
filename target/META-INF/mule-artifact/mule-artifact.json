@@ -1,7 +1,9 @@
 {
   "configs": [
+    "quiz1.xml",
     "isnull.xml",
-    "dataweave-example.xml"
+    "dataweave-example.xml",
+    "quiz2.xml"
   ],
   "secureProperties": [],
   "redeploymentEnabled": true,
@@ -16,6 +18,8 @@
         "log4j2.xml",
         "dataweave-example.xml",
         "application-types.xml",
+        "quiz2.xml",
+        "quiz1.xml",
         "examples/dwpractice3.csv",
         "isnull.xml"
       ]
