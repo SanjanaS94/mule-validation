@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:crypto="http://www.mulesoft.org/schema/mule/crypto" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/crypto http://www.mulesoft.org/schema/mule/crypto/current/mule-crypto.xsd">
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="55001af5-fa06-40e6-b02e-82a751d3e0a8" >
+		<http:request-connection host="dummyjson.com" >
+			<http:authentication >
+				<http:basic-authentication username="Sanjana" password="Sanjana" />
+			</http:authentication>
+		</http:request-connection>
+	</http:request-config>
+	<flow name="dummyFlow" doc:id="e9e4533f-db78-443e-b0e3-8f21cec82979" >
+		<http:listener doc:name="Listener" doc:id="0824b267-1087-4243-8494-90969845ca50" path="/*" config-ref="HTTP_Listener_config"/>
+		<set-payload value="#[{id: attributes.queryParams.id default null, brand: attributes.queryParams.brand default null&#10;}]" doc:name="Set Payload" doc:id="2c6fe70c-3b16-4907-9ad7-9f03e7bcdeb4" />
+		<choice doc:name="Choice" doc:id="8b62ef2d-432c-4009-abbb-6e0e4d0a1d2e" >
+			<when expression="#[payload.id == attributes.queryParams.id and (payload.id != null)]">
+				<http:request method="GET" doc:name="Request" doc:id="c5c557e1-38f7-4b3f-be71-d959dbb7f698" config-ref="HTTP_Request_configuration" path="/products">
+					<http:query-params ><![CDATA[#[output application/java
+---
+{
+	"id" : attributes.queryParams.id
+}]]]></http:query-params>
+		</http:request>
+				<ee:transform doc:name="Copy_of_Transform Message" doc:id="c94f34bc-4b6e-4749-bd48-2848381b7960">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+
+output application/json
+fun originalP(price,discount)= (price/(1-(discount/100)))
+
+---
+
+	{id: payload.id,
+	"price" : payload.price ,
+	discount: payload.discountPercentage,
+	originalPrice: originalP(payload.price,payload.discountPercentage),
+	
+	discountAmount : (originalP(payload.price,payload.discountPercentage) - payload.price) 
+	 }	
+	]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+			</when>
+			<when expression="#[(payload.brand == attributes.queryParams.brand) and (payload.brand != null)]">
+				<set-payload value="#[attributes.queryParams.brand]" doc:name="Set Payload" doc:id="4656e6a2-a07c-4b84-82e1-39995b45e63c" />
+			</when>
+			<otherwise >
+				<set-payload value="invalid" doc:name="Set Payload" doc:id="93700ffd-6338-4df5-993c-2e3411337914" />
+			</otherwise>
+		</choice>
+		<set-payload value="#[payload]" doc:name="Set Payload" doc:id="8eb4449b-1567-4f7b-a4e6-8e260ea6c311" />
+	</flow>
+</mule>
